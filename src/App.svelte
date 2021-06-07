@@ -1,30 +1,122 @@
 <script lang="ts">
-	export let name: string;
+	import Papa from "papaparse";
+	import Sugar from "sugar";
+	import type { Question } from "./Question";
+	import { sortAnswers } from "./Question";
+
+	import Collation from "./Collation.svelte";
+
+	let questions: Question[] = [];
+	let importDone: boolean = false;
+
+	function showFilePopup() {
+		let input = document.getElementById("import-file-input");
+		input.click();
+	}
+
+	function showDragOver(ev: Event) {
+		let el: HTMLElement = document.getElementById("dropzone");
+		el.classList.add("border-primary");
+	}
+
+	function hideDragOver(ev: Event) {
+		let el: HTMLElement = document.getElementById("dropzone");
+		el.classList.remove("border-primary");
+	}
+
+	async function importFile(e: Event | DragEvent) {
+		let f: File;
+		if (e instanceof DragEvent) {
+			f = e?.dataTransfer?.files?.[0];
+		} else {
+			const e = document.getElementById(
+				"import-file-input"
+			) as HTMLInputElement;
+			f = e?.files?.[0];
+		}
+		questions = await processFile(f);
+		console.log(questions);
+		importDone = true;
+	}
+
+	async function processFile(f: File): Promise<Question[]> {
+		let questions: Question[] = [];
+		let result: Promise<Question[]> = new Promise((resolve, reject) => {
+			Papa.parse(f, {
+				complete: (results) => {
+					const data = results.data;
+					// Create questions
+					for (let i = 1; i < (data[0] as string[]).length; i++) {
+						// Create answers map
+						let answers: Map<string, number> = new Map();
+						for (let j = 1; j < data.length; j++) {
+							const answerText = Sugar.String.titleize(data[j][i]);
+							answers.set(
+								answerText,
+								answers.has(answerText)
+									? answers.get(answerText) + 1
+									: 1
+							);
+						}
+						// Save question
+						questions.push({
+							text: data[0][i],
+							answers: sortAnswers(answers),
+						});
+					}
+					resolve(questions);
+				},
+			});
+		});
+		return result;
+	}
 </script>
 
 <main>
-	<h1>Hello {name}!</h1>
-	<p>Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to learn how to build Svelte apps.</p>
+	{#if importDone}
+		<Collation {questions} />
+	{:else}
+		<div class="card">
+			<div class="card-header fs-1">Survey Collate</div>
+			<div class="card-body">
+				<p>Using this utility is simple:</p>
+				<ol>
+					<li>Import your CSV file containing the survey results</li>
+					<li>De-duplicate misspellings, and merge synonyms</li>
+					<li>Configure output settings</li>
+					<li>Export results</li>
+				</ol>
+				<div
+					id="dropzone"
+					class="card border border-5"
+					on:drop|preventDefault={importFile}
+					on:dragover|preventDefault={showDragOver}
+					on:dragleave|preventDefault={hideDragOver}
+				>
+					<div class="card-body">
+						Drag your CSV file here to import it, or
+						<a href="#" on:click|preventDefault={showFilePopup}
+							>click here</a
+						>
+						<input
+							id="import-file-input"
+							type="file"
+							class="d-none"
+							on:input={importFile}
+						/>
+					</div>
+				</div>
+			</div>
+		</div>
+	{/if}
 </main>
 
 <style>
 	main {
-		text-align: center;
-		padding: 1em;
-		max-width: 240px;
-		margin: 0 auto;
-	}
-
-	h1 {
-		color: #ff3e00;
-		text-transform: uppercase;
-		font-size: 4em;
-		font-weight: 100;
-	}
-
-	@media (min-width: 640px) {
-		main {
-			max-width: none;
-		}
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		min-width: 100%;
+		min-height: 100%;
 	}
 </style>
