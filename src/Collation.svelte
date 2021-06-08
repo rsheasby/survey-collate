@@ -37,6 +37,9 @@
     </div>
     <div class="card-body">
     </div>
+    <div id="collate-card-footer" class="card-footer">
+        <button class="btn btn-success">Merge</button>
+    </div>
 </div>
 
 <style>
@@ -58,6 +61,15 @@
         grid-auto-flow: column;
         grid-template-columns: auto 1fr auto;
         align-items: center;
+    }
+
+    #collate-card-footer {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    #collate-card-footer > button {
+        margin: 0;
     }
 
     #current-question-text-container {
