@@ -49,7 +49,7 @@
 				complete: (results) => {
 					const data = results.data;
 					// Create questions
-					for (let i = 1; i < (data[0] as string[]).length; i++) {
+					for (let i = data[0][0] === 'Timestamp'? 1 : 0; i < (data[0] as string[]).length; i++) {
 						// Create answers map
 						let answers: Answer[] = [];
 						for (let j = 1; j < data.length; j++) {
