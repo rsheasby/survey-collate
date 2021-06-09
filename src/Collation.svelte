@@ -71,12 +71,16 @@
         undoState = undoState;
         clearAnswerSelections();
     }
+
+    function exportResults() {
+
+    }
 </script>
 
 <div id="collate-card" class="card m-4">
     <div id="collate-card-header" class="card-header gap-4 fs-2">
         <button
-            class="btn btn-success nav-button"
+            class="btn btn-primary nav-button"
             disabled={!canGoLeft}
             on:click={goLeft}
         >
@@ -85,13 +89,22 @@
         <div id="current-question-text-container">
             {currentQuestion.text}
         </div>
-        <button
-            class="btn btn-success nav-button"
-            disabled={!canGoRight}
-            on:click={goRight}
-        >
-            <i class="far fa-arrow-right" />
-        </button>
+        {#if canGoRight}
+            <button
+                class="btn btn-primary nav-button"
+                disabled={!canGoRight}
+                on:click={goRight}
+            >
+                <i class="far fa-arrow-right" />
+            </button>
+        {:else}
+            <button
+                class="btn btn-success nav-button"
+                on:click={exportResults}
+            >
+                <i class="far fa-file-download" />
+            </button>
+        {/if}
     </div>
     <div id="collate-card-answers-container" class="card-body gap-2">
         {#each currentAnswers as answer}
@@ -137,7 +150,7 @@
     }
 
     .nav-button {
-        line-height: 0;
+        line-height: 1;
         margin: 0;
     }
 
