@@ -1,47 +1,79 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
-    import type { Question } from './Question';
+    import { onMount } from "svelte";
+    import type { Question, Answer } from "./Question";
 
     export let questions: Question[];
     let currentQuestionNumber: number = 0;
+
     $: currentQuestion = questions[currentQuestionNumber];
+    $: currentAnswers = currentQuestion.answers;
+    $: baseAnswer = currentAnswers.filter(a => a.isBaseSelected)?.[0];
+    $: mergeAnswers = currentAnswers.filter(a => a.isMergeSelected);
     $: canGoLeft = currentQuestionNumber > 0;
-    $: canGoRight = currentQuestionNumber < (questions.length - 1);
+    $: canGoRight = currentQuestionNumber < questions.length - 1;
 
     function goLeft() {
-        if (canGoLeft)
-            currentQuestionNumber--;
+        if (canGoLeft) currentQuestionNumber--;
     }
 
     function goRight() {
-        if (canGoRight)
-            currentQuestionNumber++;
+        if (canGoRight) currentQuestionNumber++;
     }
 
-    function selectAnswer(i: number) {
-        console.log([...currentQuestion.answers][i]);
+    function selectAnswer(answer: Answer) {
+        if (baseAnswer === undefined)
+            answer.isBaseSelected = true;
+        else if (baseAnswer === answer)
+            clearAnswerSelections();
+        else
+            answer.isMergeSelected = !answer.isMergeSelected;
+        currentAnswers = currentAnswers;
+    }
+
+    function clearAnswerSelections() {
+        currentAnswers.forEach(a => {
+            a.isBaseSelected = false;
+            a.isMergeSelected = false;
+        });
     }
 </script>
 
 <div id="collate-card" class="card">
     <div id="collate-card-header" class="card-header gap-3 fs-2">
         <div>
-            <button class="nav-button" class:text-secondary={!canGoLeft} disabled={!canGoLeft} on:click={goLeft}>
-                <i class="far fa-arrow-alt-circle-left"></i>
+            <button
+                class="nav-button"
+                class:text-secondary={!canGoLeft}
+                disabled={!canGoLeft}
+                on:click={goLeft}
+            >
+                <i class="far fa-arrow-alt-circle-left" />
             </button>
         </div>
         <div id="current-question-text-container">
             {currentQuestion.text}
         </div>
         <div>
-            <button class="nav-button" class:text-secondary={!canGoRight} disabled={!canGoRight} on:click={goRight}>
-                <i class="far fa-arrow-alt-circle-right"></i>
+            <button
+                class="nav-button"
+                class:text-secondary={!canGoRight}
+                disabled={!canGoRight}
+                on:click={goRight}
+            >
+                <i class="far fa-arrow-alt-circle-right" />
             </button>
         </div>
     </div>
     <div class="card-body d-grid">
-        {#each [...currentQuestion.answers] as [answer, points], i}
-            <button class="btn btn-secondary" on:click={() => selectAnswer(i)}>{answer}</button>
+        {#each currentAnswers as answer}
+            <button
+                class="btn"
+                class:btn-outline-dark={!answer.isBaseSelected &&
+                    !answer.isMergeSelected}
+                class:btn-success={answer.isBaseSelected}
+                class:btn-primary={answer.isMergeSelected}
+                on:click={() => selectAnswer(answer)}>{answer.text}</button
+            >
         {/each}
     </div>
     <div id="collate-card-footer" class="card-footer">
