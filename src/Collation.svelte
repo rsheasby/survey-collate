@@ -61,32 +61,26 @@
 </script>
 
 <div id="collate-card" class="card m-4">
-    <div id="collate-card-header" class="card-header gap-2 fs-2">
-        <div>
-            <button
-                class="nav-button"
-                class:text-secondary={!canGoLeft}
-                disabled={!canGoLeft}
-                on:click={goLeft}
-            >
-                <i class="far fa-arrow-alt-circle-left" />
-            </button>
-        </div>
+    <div id="collate-card-header" class="card-header gap-4 fs-2">
+        <button
+            class="btn btn-success nav-button"
+            disabled={!canGoLeft}
+            on:click={goLeft}
+        >
+            <i class="far fa-arrow-left" />
+        </button>
         <div id="current-question-text-container">
             {currentQuestion.text}
         </div>
-        <div>
-            <button
-                class="nav-button"
-                class:text-secondary={!canGoRight}
-                disabled={!canGoRight}
-                on:click={goRight}
-            >
-                <i class="far fa-arrow-alt-circle-right" />
-            </button>
-        </div>
+        <button
+            class="btn btn-success nav-button"
+            disabled={!canGoRight}
+            on:click={goRight}
+        >
+            <i class="far fa-arrow-right" />
+        </button>
     </div>
-    <div class="card-body d-grid">
+    <div id="collate-card-answers-container" class="card-body gap-2">
         {#each currentAnswers as answer}
             <button
                 class="btn"
@@ -111,15 +105,8 @@
 </div>
 
 <style>
-    .nav-button {
-        line-height: 100%;
-        border-radius: 50%;
-        padding: 0;
-        margin: 0;
-    }
-
     #collate-card {
-        max-width: 600px;
+        max-width: 800px;
         width: 100%;
     }
 
@@ -128,8 +115,16 @@
         display: grid;
         grid-auto-flow: column;
         grid-template-columns: auto 1fr auto;
-        align-items: center;
+        grid-template-rows: 1fr;
+        align-items: stretch;
+        position: relative;
     }
+
+    .nav-button {
+        line-height: 0;
+        margin: 0;
+    }
+
 
     #collate-card-footer {
         display: grid;
@@ -144,5 +139,15 @@
     #current-question-text-container {
         display: flex;
         justify-content: center;
+    }
+
+    #collate-card-answers-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr;
+    }
+
+    #collate-card-answers-container > button {
+        margin: 0;
     }
 </style>
