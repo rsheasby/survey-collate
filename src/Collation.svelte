@@ -1,14 +1,14 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import type { Question, Answer } from "./Question";
+    import { Question, Answer, removeAnswer, sortAnswers } from "./Question";
 
     export let questions: Question[];
     let currentQuestionNumber: number = 0;
 
     $: currentQuestion = questions[currentQuestionNumber];
     $: currentAnswers = currentQuestion.answers;
-    $: baseAnswer = currentAnswers.filter(a => a.isBaseSelected)?.[0];
-    $: mergeAnswers = currentAnswers.filter(a => a.isMergeSelected);
+    $: selectedBaseAnswer = currentAnswers.filter(a => a.isBaseSelected)?.[0];
+    $: selectedMergeAnswers = currentAnswers.filter(a => a.isMergeSelected);
     $: canGoLeft = currentQuestionNumber > 0;
     $: canGoRight = currentQuestionNumber < questions.length - 1;
 
@@ -21,9 +21,9 @@
     }
 
     function selectAnswer(answer: Answer) {
-        if (baseAnswer === undefined)
+        if (selectedBaseAnswer === undefined)
             answer.isBaseSelected = true;
-        else if (baseAnswer === answer)
+        else if (selectedBaseAnswer === answer)
             clearAnswerSelections();
         else
             answer.isMergeSelected = !answer.isMergeSelected;
@@ -36,9 +36,18 @@
             a.isMergeSelected = false;
         });
     }
+
+    function mergeAnswers() {
+        currentAnswers.filter(a => a.isMergeSelected).forEach(a => {
+            selectedBaseAnswer.points += a.points;
+            currentQuestion.answers = removeAnswer(currentQuestion.answers, a.text);
+        });
+        clearAnswerSelections();
+        currentQuestion.answers = sortAnswers(currentQuestion.answers);
+    }
 </script>
 
-<div id="collate-card" class="card">
+<div id="collate-card" class="card m-4">
     <div id="collate-card-header" class="card-header gap-3 fs-2">
         <div>
             <button
@@ -72,12 +81,12 @@
                     !answer.isMergeSelected}
                 class:btn-success={answer.isBaseSelected}
                 class:btn-primary={answer.isMergeSelected}
-                on:click={() => selectAnswer(answer)}>{answer.text}</button
+                on:click={() => selectAnswer(answer)}>{answer.points} - {answer.text}</button
             >
         {/each}
     </div>
     <div id="collate-card-footer" class="card-footer">
-        <button class="btn btn-success">Merge</button>
+        <button class="btn btn-success" on:click={mergeAnswers}>Merge</button>
     </div>
 </div>
 

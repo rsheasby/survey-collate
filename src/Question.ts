@@ -26,6 +26,10 @@ export function addAnswer(answers: Answer[], text: string): Answer[] {
     return answers;
 }
 
+export function removeAnswer(answers: Answer[], text: string): Answer[] {
+    return answers.filter(a => a.text !== text);
+}
+
 export function sortAnswers(answers: Answer[]): Answer[] {
     return answers.sort((a, b) => b.points - a.points);
 }
