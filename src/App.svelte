@@ -80,7 +80,7 @@
 				<p>Using this utility is simple:</p>
 				<ol>
 					<li>Import your Google Forms CSV file containing the survey results</li>
-					<li>Select and merge duplicate answers</li>
+					<li>Select and merge similar answers</li>
 					<li>Configure output settings</li>
 					<li>Export results</li>
 				</ol>

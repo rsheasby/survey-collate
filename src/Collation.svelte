@@ -3,6 +3,7 @@
     import { Question, Answer, removeAnswer, sortAnswers } from "./Question";
 
     export let questions: Question[];
+    let undoState: Question[][] = [];
     let currentQuestionNumber: number = 0;
 
     $: currentQuestion = questions[currentQuestionNumber];
@@ -11,6 +12,8 @@
     $: selectedMergeAnswers = currentAnswers.filter(a => a.isMergeSelected);
     $: canGoLeft = currentQuestionNumber > 0;
     $: canGoRight = currentQuestionNumber < questions.length - 1;
+    $: canMerge = (selectedBaseAnswer && selectedMergeAnswers.length > 0);
+    $: canUndo = undoState.length > 0;
 
     function goLeft() {
         if (canGoLeft) currentQuestionNumber--;
@@ -38,6 +41,11 @@
     }
 
     function mergeAnswers() {
+        if (!canMerge)
+            return;
+
+        undoState.push(JSON.parse(JSON.stringify(questions)));
+        undoState = undoState;
         currentAnswers.filter(a => a.isMergeSelected).forEach(a => {
             selectedBaseAnswer.points += a.points;
             currentQuestion.answers = removeAnswer(currentQuestion.answers, a.text);
@@ -45,10 +53,15 @@
         clearAnswerSelections();
         currentQuestion.answers = sortAnswers(currentQuestion.answers);
     }
+
+    function undo() {
+        questions = undoState.pop();
+        undoState = undoState;
+    }
 </script>
 
 <div id="collate-card" class="card m-4">
-    <div id="collate-card-header" class="card-header gap-3 fs-2">
+    <div id="collate-card-header" class="card-header gap-2 fs-2">
         <div>
             <button
                 class="nav-button"
@@ -85,8 +98,15 @@
             >
         {/each}
     </div>
-    <div id="collate-card-footer" class="card-footer">
-        <button class="btn btn-success" on:click={mergeAnswers}>Merge</button>
+    <div id="collate-card-footer" class="card-footer gap-2">
+        <button class="btn btn-primary" on:click={undo} disabled={!canUndo}>
+            <i class="fas fa-undo"></i>
+            Undo
+        </button>
+        <button class="btn btn-success" on:click={mergeAnswers} disabled={!canMerge}>
+            <i class="fas fa-code-branch"></i>
+            Merge
+        </button>
     </div>
 </div>
 
@@ -112,7 +132,8 @@
     }
 
     #collate-card-footer {
-        display: flex;
+        display: grid;
+        grid-auto-flow: column;
         justify-content: flex-end;
     }
 
