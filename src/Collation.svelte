@@ -5,6 +5,7 @@
     export let questions: Question[];
     let undoState: Question[][] = [];
     let currentQuestionNumber: number = 0;
+    let newText: string = null;
 
     $: currentQuestion = questions[currentQuestionNumber];
     $: currentAnswers = currentQuestion.answers;
@@ -16,16 +17,24 @@
     $: canUndo = undoState.length > 0;
 
     function goLeft() {
-        if (canGoLeft) currentQuestionNumber--;
+        if (canGoLeft) {
+            currentQuestionNumber--;
+            clearAnswerSelections();
+        }
     }
 
     function goRight() {
-        if (canGoRight) currentQuestionNumber++;
+        if (canGoRight) {
+            currentQuestionNumber++;
+            clearAnswerSelections();
+        }
     }
 
     function selectAnswer(answer: Answer) {
-        if (selectedBaseAnswer === undefined)
+        if (selectedBaseAnswer === undefined) {
             answer.isBaseSelected = true;
+            newText = answer.text;
+        }
         else if (selectedBaseAnswer === answer)
             clearAnswerSelections();
         else
@@ -34,10 +43,11 @@
     }
 
     function clearAnswerSelections() {
-        currentAnswers.forEach(a => {
+        newText = null;
+        questions.forEach(q => q.answers.forEach(a => {
             a.isBaseSelected = false;
             a.isMergeSelected = false;
-        });
+        }));
     }
 
     function mergeAnswers() {
@@ -50,6 +60,7 @@
             selectedBaseAnswer.points += a.points;
             currentQuestion.answers = removeAnswer(currentQuestion.answers, a.text);
         });
+        selectedBaseAnswer.text = newText;
         clearAnswerSelections();
         currentQuestion.answers = sortAnswers(currentQuestion.answers);
     }
@@ -57,6 +68,7 @@
     function undo() {
         questions = undoState.pop();
         undoState = undoState;
+        clearAnswerSelections();
     }
 </script>
 
@@ -97,6 +109,7 @@
             <i class="fas fa-undo"></i>
             Undo
         </button>
+        <input id="new-text-input" type="text" class="form-control" bind:value={newText} disabled={newText === null}>
         <button class="btn btn-success" on:click={mergeAnswers} disabled={!canMerge}>
             <i class="fas fa-code-branch"></i>
             Merge
@@ -117,7 +130,9 @@
         grid-template-columns: auto 1fr auto;
         grid-template-rows: 1fr;
         align-items: stretch;
-        position: relative;
+        position: sticky;
+        top: 0;
+        background-color: white;
     }
 
     .nav-button {
@@ -129,10 +144,18 @@
     #collate-card-footer {
         display: grid;
         grid-auto-flow: column;
-        justify-content: flex-end;
+        grid-template-columns: auto 1fr auto;
+        align-items: stretch;
+        position: sticky;
+        bottom: 0;
+        background-color: white;
     }
 
     #collate-card-footer > button {
+        margin: 0;
+    }
+
+    #collate-card-footer > input {
         margin: 0;
     }
 
