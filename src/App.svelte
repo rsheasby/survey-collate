@@ -1,12 +1,15 @@
 <script lang="ts">
 	import Papa from "papaparse";
 	import Sugar from "sugar";
-	import type { Question } from "./Question";
-	import { sortAnswers } from "./Question";
+	import type { Question, Answer } from "./Question";
+	import { addAnswer, sortAnswers } from "./Question";
 
 	import Collation from "./Collation.svelte";
 
-	let questions: Question[] = [];
+	let questions: Question[] = [{
+		text: 'test',
+		answers: []
+	}];
 	let importDone: boolean = false;
 
 	function showFilePopup() {
@@ -48,15 +51,10 @@
 					// Create questions
 					for (let i = 1; i < (data[0] as string[]).length; i++) {
 						// Create answers map
-						let answers: Map<string, number> = new Map();
+						let answers: Answer[] = [];
 						for (let j = 1; j < data.length; j++) {
 							const answerText = Sugar.String.titleize(data[j][i]);
-							answers.set(
-								answerText,
-								answers.has(answerText)
-									? answers.get(answerText) + 1
-									: 1
-							);
+							answers = addAnswer(answers, answerText);
 						}
 						// Save question
 						questions.push({
@@ -118,5 +116,6 @@
 		align-items: center;
 		min-width: 100%;
 		min-height: 100%;
+		position: relative;
 	}
 </style>

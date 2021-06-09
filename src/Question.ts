@@ -1,8 +1,31 @@
 export class Question {
     text: string;
-    answers: Map<string, number>
+    answers: Answer[]
 }
 
-export function sortAnswers(answers: Map<string, number>): Map<string, number> {
-    return new Map([...answers.entries()].sort((a, b) => b[1] - a[1]));
+export class Answer {
+    text: string;
+    points: number;
+    isBaseSelected: boolean;
+    isMergeSelected: boolean;
+}
+
+export function addAnswer(answers: Answer[], text: string): Answer[] {
+    for (let i = 0; i < answers.length; i++) {
+        if (answers[i].text === text) {
+            answers[i].points++;
+            return answers;
+        }
+    }
+    answers.push({
+        text: text,
+        points: 1,
+        isBaseSelected: false,
+        isMergeSelected: false
+    });
+    return answers;
+}
+
+export function sortAnswers(answers: Answer[]): Answer[] {
+    return answers.sort((a, b) => b.points - a.points);
 }
