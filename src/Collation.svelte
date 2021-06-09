@@ -17,6 +17,10 @@
         if (canGoRight)
             currentQuestionNumber++;
     }
+
+    function selectAnswer(i: number) {
+        console.log([...currentQuestion.answers][i]);
+    }
 </script>
 
 <div id="collate-card" class="card">
@@ -35,7 +39,10 @@
             </button>
         </div>
     </div>
-    <div class="card-body">
+    <div class="card-body d-grid">
+        {#each [...currentQuestion.answers] as [answer, points], i}
+            <button class="btn btn-secondary" on:click={() => selectAnswer(i)}>{answer}</button>
+        {/each}
     </div>
     <div id="collate-card-footer" class="card-footer">
         <button class="btn btn-success">Merge</button>
