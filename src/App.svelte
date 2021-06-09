@@ -38,7 +38,6 @@
 			f = e?.files?.[0];
 		}
 		questions = await processFile(f);
-		console.log(questions);
 		importDone = true;
 	}
 
@@ -80,7 +79,7 @@
 				<p>Using this utility is simple:</p>
 				<ol>
 					<li>Import your Google Forms CSV file containing the survey results</li>
-					<li>Select and merge similar answers</li>
+					<li>Click answers to rename them,<br>or select multiple to merge them into one answer.</li>
 					<li>Configure output settings</li>
 					<li>Export results</li>
 				</ol>

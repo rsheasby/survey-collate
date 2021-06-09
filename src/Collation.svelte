@@ -13,7 +13,8 @@
     $: selectedMergeAnswers = currentAnswers.filter(a => a.isMergeSelected);
     $: canGoLeft = currentQuestionNumber > 0;
     $: canGoRight = currentQuestionNumber < questions.length - 1;
-    $: canMerge = (selectedBaseAnswer && selectedMergeAnswers.length > 0);
+    $: canRename = (selectedBaseAnswer);
+    $: canMerge = (canRename && selectedMergeAnswers.length > 0);
     $: canUndo = undoState.length > 0;
 
     function goLeft() {
@@ -51,7 +52,7 @@
     }
 
     function mergeAnswers() {
-        if (!canMerge)
+        if (!canRename)
             return;
 
         undoState.push(JSON.parse(JSON.stringify(questions)));
@@ -110,9 +111,9 @@
             Undo
         </button>
         <input id="new-text-input" type="text" class="form-control" bind:value={newText} disabled={newText === null}>
-        <button class="btn btn-success" on:click={mergeAnswers} disabled={!canMerge}>
-            <i class="fas fa-code-branch"></i>
-            Merge
+        <button class="btn btn-success" on:click={mergeAnswers} disabled={!canRename}>
+            <i class="fas {canMerge? 'fa-code-branch': 'fa-pencil-alt'}"></i>
+            {canMerge? 'Merge' : 'Rename'}
         </button>
     </div>
 </div>
