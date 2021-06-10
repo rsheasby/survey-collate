@@ -79,9 +79,7 @@
 				<p>Using this utility is simple:</p>
 				<ol>
 					<li>Import your Google Forms CSV file containing the survey results</li>
-					<li>
-						Click answers to rename them,<br />or select multiple to merge them into one answer.
-					</li>
+					<li>Click answers to rename, delete, or merge them.</li>
 					<li>Configure output settings</li>
 					<li>Export results</li>
 				</ol>
