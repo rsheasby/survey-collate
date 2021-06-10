@@ -1,11 +1,14 @@
 <script lang="ts">
-    import { onMount } from "svelte";
-    import { Question, Answer, removeAnswer, sortAnswers } from "./Question";
+    import { onMount } from 'svelte';
+    import { Question, Answer, removeAnswer, sortAnswers } from './Question';
+
+    import Export from './Export.svelte';
 
     export let questions: Question[];
     let undoState: Question[][] = [];
     let currentQuestionNumber: number = 0;
     let newText: string = null;
+    let exportDialogShown: boolean = false;
 
     $: currentQuestion = questions[currentQuestionNumber];
     $: currentAnswers = currentQuestion.answers;
@@ -29,6 +32,14 @@
             currentQuestionNumber++;
             clearAnswerSelections();
         }
+    }
+
+    function openExportDialog() {
+        exportDialogShown = true;
+    }
+
+    function closeExportDialog() {
+        exportDialogShown = false;
     }
 
     function selectAnswer(answer: Answer) {
@@ -71,12 +82,11 @@
         undoState = undoState;
         clearAnswerSelections();
     }
-
-    function exportResults() {
-
-    }
 </script>
 
+{#if exportDialogShown}
+    <Export {questions} close={closeExportDialog}></Export>
+{:else}
 <div id="collate-card" class="card m-4">
     <div id="collate-card-header" class="card-header gap-4 fs-2">
         <button
@@ -100,7 +110,7 @@
         {:else}
             <button
                 class="btn btn-success nav-button"
-                on:click={exportResults}
+                on:click={openExportDialog}
             >
                 <i class="far fa-file-download" />
             </button>
@@ -130,6 +140,7 @@
         </button>
     </div>
 </div>
+{/if}
 
 <style>
     #collate-card {
