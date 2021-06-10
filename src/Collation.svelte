@@ -18,6 +18,7 @@
     $: canGoRight = currentQuestionNumber < questions.length - 1;
     $: canRename = selectedBaseAnswer;
     $: canMerge = canRename && selectedMergeAnswers.length > 0;
+    $: canDelete = canRename;
     $: canUndo = undoState.length > 0;
 
     function goLeft() {
@@ -80,6 +81,19 @@
         currentQuestion.answers = sortAnswers(currentQuestion.answers);
     }
 
+    function deleteSelectedAnswers() {
+        undoState.push(JSON.parse(JSON.stringify(questions)));
+        undoState = undoState;
+
+        if (!selectedBaseAnswer)
+            return;
+        currentQuestion.answers = removeAnswer(currentQuestion.answers, selectedBaseAnswer.text);
+        selectedMergeAnswers?.forEach(a => {
+            currentQuestion.answers = removeAnswer(currentQuestion.answers, a.text);
+        });
+        clearAnswerSelections();
+    }
+
     function undo() {
         questions = undoState.pop();
         undoState = undoState;
@@ -137,6 +151,16 @@
                 <i class="fas fa-undo" />
                 Undo
             </button>
+            <button
+                class="btn btn-danger"
+                on:click={deleteSelectedAnswers}
+                disabled={!canDelete}
+            >
+                <i
+                    class="fas fa-trash"
+                />
+                Delete
+            </button>
             <input
                 id="new-text-input"
                 type="text"
@@ -184,7 +208,7 @@
     #collate-card-footer {
         display: grid;
         grid-auto-flow: column;
-        grid-template-columns: auto 1fr auto;
+        grid-template-columns: auto auto 1fr auto;
         align-items: stretch;
         position: sticky;
         bottom: 0;
