@@ -6,10 +6,12 @@
 
 	import Collation from "./Collation.svelte";
 
-	let questions: Question[] = [{
-		text: 'test',
-		answers: []
-	}];
+	let questions: Question[] = [
+		{
+			text: "test",
+			answers: [],
+		},
+	];
 	let importDone: boolean = false;
 
 	function showFilePopup() {
@@ -43,28 +45,60 @@
 
 	async function processFile(f: File): Promise<Question[]> {
 		let questions: Question[] = [];
-		let result: Promise<Question[]> = new Promise((resolve, reject) => {
-			Papa.parse(f, {
-				complete: (results) => {
-					const data = results.data;
-					// Create questions
-					for (let i = data[0][0] === 'Timestamp'? 1 : 0; i < (data[0] as string[]).length; i++) {
-						// Create answers map
-						let answers: Answer[] = [];
-						for (let j = 1; j < data.length; j++) {
-							const answerText = Sugar.String.titleize(data[j][i]);
-							answers = addAnswer(answers, answerText);
+		let result: Promise<Question[]> = new Promise(
+			(resolve, reject) => {
+				Papa.parse(f, {
+					complete: (results) => {
+						const data = results.data;
+						// Create questions
+						for (
+							let i =
+								data[0][0] ===
+								"Timestamp"
+									? 1
+									: 0;
+							i <
+							(data[0] as string[])
+								.length;
+							i++
+						) {
+							// Create answers map
+							let answers: Answer[] =
+								[];
+							for (
+								let j = 1;
+								j < data.length;
+								j++
+							) {
+								const answerText =
+									Sugar.String.titleize(
+										data[
+											j
+										][
+											i
+										]
+									);
+								answers =
+									addAnswer(
+										answers,
+										answerText
+									);
+							}
+							// Save question
+							questions.push({
+								text: data[0][
+									i
+								],
+								answers: sortAnswers(
+									answers
+								),
+							});
 						}
-						// Save question
-						questions.push({
-							text: data[0][i],
-							answers: sortAnswers(answers),
-						});
-					}
-					resolve(questions);
-				},
-			});
-		});
+						resolve(questions);
+					},
+				});
+			}
+		);
 		return result;
 	}
 </script>
@@ -78,8 +112,16 @@
 			<div class="card-body">
 				<p>Using this utility is simple:</p>
 				<ol>
-					<li>Import your Google Forms CSV file containing the survey results</li>
-					<li>Click answers to rename them,<br>or select multiple to merge them into one answer.</li>
+					<li>
+						Import your Google Forms CSV
+						file containing the survey
+						results
+					</li>
+					<li>
+						Click answers to rename them,<br
+						/>or select multiple to merge
+						them into one answer.
+					</li>
 					<li>Configure output settings</li>
 					<li>Export results</li>
 				</ol>
@@ -91,8 +133,11 @@
 					on:dragleave|preventDefault={hideDragOver}
 				>
 					<div class="card-body">
-						Drag your CSV file here to import it, or
-						<a href="#" on:click|preventDefault={showFilePopup}
+						Drag your CSV file here to
+						import it, or
+						<a
+							href="#"
+							on:click|preventDefault={showFilePopup}
 							>click here</a
 						>
 						<input
