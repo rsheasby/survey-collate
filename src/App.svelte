@@ -58,7 +58,7 @@
 						// Save question
 						questions.push({
 							text: data[0][i],
-							answers: sortAnswers(answers),
+							answers: sortAnswers(answers).filter(a => a.text !== ''),
 						});
 					}
 					resolve(questions);
